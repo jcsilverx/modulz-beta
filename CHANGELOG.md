@@ -1,5 +1,11 @@
 # @zphyrx/modulz-temp-beta
 
+## 0.0.3
+
+### Patch Changes
+
+- 774a11e: Add `definePkgJson` method
+
 ## 0.0.2
 
 ### Patch Changes
