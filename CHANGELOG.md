@@ -1,5 +1,11 @@
 # @zphyrx/modulz-temp-beta
 
+## 0.0.2
+
+### Patch Changes
+
+- a645b7b: Add
+
 ## 0.0.1
 
 ### Patch Changes
