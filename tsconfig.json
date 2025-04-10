@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Library",
+  "compilerOptions": {
+    /**
+     * BASE OPTIONS
+     */
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "allowJs": false,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+
+    /**
+     * STRICTNESS OPTIONS
+     */
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "noUnusedParameters": true,
+    "noUncheckedIndexedAccess": false,
+
+    /**
+     * EMIT RULES
+     */
+    "noEmit": true,
+
+    /**
+     * LIBRARY OPTIONS
+     */
+    "declaration": true,
+
+    /**
+     * NO-DOM OPTIONS
+     */
+    "lib": ["ES2022"],
+
+    /**
+     * OTHER OPTIONS
+     */
+    "forceConsistentCasingInFileNames": true,
+
+    /**
+     * MORE OPTIONS
+     */
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "outDir": "dist/esm",
+    "types": ["vitest/globals"],
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@zphyrx/@zphyrx/modulz-temp-beta": ["./src/*"]
+    }
+  },
+  "include": ["src", "**/*.ts", "**/*.mts"],
+  "exclude": ["node_modules", "dist"]
+}
