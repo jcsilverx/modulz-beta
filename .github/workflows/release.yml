@@ -9,7 +9,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   release:
-    if: github.repository == 'jcsilverx/modulz'
+    if: github.repository == 'jcsilverx/modulz-beta'
 
     runs-on: ubuntu-latest
 
