@@ -9,7 +9,7 @@ import type { Either } from "./types";
 
 const find = async (
   searchString: string,
-  rootDir: string,
+  rootDir: string | url.URL = ".",
 ): Promise<Either<string, string>> => {
   let F =
     isObject(rootDir) || rootDir.startsWith("file://")
@@ -18,21 +18,15 @@ const find = async (
 
   let currentDir = path.dirname(F);
 
-  while (path.dirname(currentDir) !== currentDir) {
+  try {
     let P = path.join(currentDir, searchString);
 
-    try {
-      await fs.promises.access(P, fs.constants.F_OK);
+    await fs.promises.access(P, fs.constants.F_OK);
 
-      return right(P);
-    } catch {
-      currentDir = path.dirname(currentDir);
-    }
-  }
+    return right(P);
+  } catch {}
 
-  return left(
-    `find: '${path.basename(searchString)}': No such file or directory`,
-  );
+  return left(`'${searchString}': No such file or directory`);
 };
 
 export { find };

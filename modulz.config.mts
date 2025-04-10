@@ -1,7 +1,7 @@
 import * as zphyrx from "@zphyrx/modulz-temp-beta";
 
-export default zphyrx.run({
-  rootDir: import.meta.url,
+export default zphyrx.definePkgJson({
+  // rootDir: import.meta.url,
   exports: {
     "./array": {
       import: {

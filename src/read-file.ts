@@ -1,20 +1,26 @@
 import * as fs from "fs";
 
 import { find } from "./find";
-import { isRight } from "./either";
+import { isRight, left, right } from "./either";
 
-const readFile = async (filename: string, rootDir: string): Promise<string> => {
-  let response = await find(filename, rootDir);
+import type * as url from "url";
+import type { Either } from "./types";
 
-  if (!isRight(response)) {
-    throw new Error(response.left);
+const readFile = async (
+  filename: string,
+  rootDir: string | url.URL = ".",
+): Promise<Either<string, string>> => {
+  let R = await find(filename, rootDir);
+
+  if (!isRight(R)) {
+    return left(R.left);
   }
 
-  let content = await fs.promises.readFile(response.right, {
+  let C = await fs.promises.readFile(R.right, {
     encoding: "utf-8",
   });
 
-  return content;
+  return right(C);
 };
 
 export { readFile };

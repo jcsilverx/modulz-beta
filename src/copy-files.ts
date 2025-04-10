@@ -5,20 +5,24 @@ import { find } from "./find";
 import { isRight } from "./either";
 
 const copyFiles = async (
-  src: readonly string[],
-  dest: string,
-  rootDir: string,
+  files: ReadonlyArray<string>,
+  outDir: string,
 ): Promise<void> => {
-  if (src.length === 0) return;
+  if (files.length === 0) return;
 
-  for (let s of src) {
-    let F = await find(s, rootDir);
+  for (let file of files) {
+    let F = await find(file);
 
     if (!isRight(F)) {
-      throw new Error(F.left);
+      console.warn(F.left);
+
+      continue;
     }
 
-    await fs.promises.copyFile(F.right, `${dest}/${path.basename(s)}`);
+    await fs.promises.copyFile(
+      F.right,
+      path.join(outDir, path.basename(F.right)),
+    );
   }
 
   return;

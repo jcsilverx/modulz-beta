@@ -6,6 +6,7 @@ import {
   copyFiles,
   filter,
   find,
+  fromRight,
   isNonEmpty,
   isRight,
   loadPkgJson,
@@ -17,28 +18,33 @@ import {
 const OUT_DIR = "dist";
 const PKG = "package.json";
 
-const run = async (options: Options): Promise<void> => {
+const definePkgJson = async (
+  options: Options & Record<string, unknown>,
+): Promise<void> => {
   let {
-    rootDir,
+    rootDir = ".",
+    outDir = OUT_DIR,
     include = [],
     exclude = [],
-    outDir = OUT_DIR,
     omit = [],
     ...rest
   } = options;
 
-  let content = filter(
-    await loadPkgJson(rootDir),
-    (_, Pk): boolean => !omit.includes(Pk),
+  let C = fromRight(await loadPkgJson(rootDir), (r: Record<string, unknown>) =>
+    filter(r, (_, Pk): boolean => !omit.includes(Pk)),
   );
 
-  // @ts-expect-error  -- silent for now
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  content.files = content.files?.filter((e: string) => !exclude.includes(e));
+  if (!isRight(C)) {
+    throw new Error(C.left);
+  }
 
-  let json = mergePkgJson(content, rest);
+  let json = mergePkgJson(C.right, rest);
 
-  let out = await find(outDir, rootDir);
+  if (Object.hasOwn(json, "files") && Array.isArray(json.files)) {
+    json.files = json.files.filter((f: string) => !exclude.includes(f));
+  }
+
+  let out = await find(outDir);
 
   if (!isRight(out)) {
     throw new Error(out.left);
@@ -53,9 +59,9 @@ const run = async (options: Options): Promise<void> => {
     JSON.stringify(json, null, 2),
   );
 
-  await copyFiles(include, out.right, rootDir);
+  await copyFiles(include, out.right);
 
   return;
 };
 
-export { run };
+export { definePkgJson };

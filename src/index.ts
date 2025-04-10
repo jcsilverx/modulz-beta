@@ -11,4 +11,4 @@ export * from "./find";
 export * from "./load-pkg-json";
 export * from "./merge-pkg-json";
 export * from "./read-file";
-export * from "./run";
+export * from "./define-pkg-json";
