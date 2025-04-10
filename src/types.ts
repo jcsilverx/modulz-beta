@@ -19,6 +19,17 @@ type Right<R> = {
 
 type Either<L, R> = Left<L> | Right<R>;
 
+type None = {
+  readonly _tag: "None";
+};
+
+type Some<T> = {
+  readonly _tag: "Some";
+  readonly value: T;
+};
+
+type Option<T> = Some<T> | None;
+
 // type OptionsBase = {
 //   /**
 //    * The name of the package.
@@ -183,4 +194,7 @@ export type {
   Left,
   Right,
   Either,
+  None,
+  Some,
+  Option,
 };

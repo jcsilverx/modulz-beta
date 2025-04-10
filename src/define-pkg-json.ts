@@ -1,28 +1,21 @@
-import * as fs from "fs";
+import { promises as fs } from "fs";
 import * as path from "path";
-// import * as url from "url";
 
-import {
-  copyFiles,
-  filter,
-  find,
-  fromRight,
-  isNonEmpty,
-  isRight,
-  loadPkgJson,
-  mergePkgJson,
-  // eslint-disable-next-line import-x/consistent-type-specifier-style
-  type Options,
-} from ".";
+import * as A from "./fp-utils/array";
+import * as E from "./fp-utils/either";
+import * as R from "./fp-utils/record";
+import * as F from "./fp-utils/function";
+import { loadPkgJson } from "./load-pkg-json";
+import { mergePkgJson } from "./merge-pkg-json";
+import { find } from "./find";
+import { copyFiles } from "./copy-files";
+import { OUT_DIR, PKG, ROOT_DIR } from "./constants";
 
-const OUT_DIR = "dist";
-const PKG = "package.json";
+import type { Options } from "./types";
 
-const definePkgJson = async (
-  options: Options & Record<string, unknown>,
-): Promise<void> => {
+const definePkgJson = async (options: Options): Promise<void> => {
   let {
-    rootDir = ".",
+    rootDir = ROOT_DIR,
     outDir = OUT_DIR,
     include = [],
     exclude = [],
@@ -30,34 +23,38 @@ const definePkgJson = async (
     ...rest
   } = options;
 
-  let C = fromRight(await loadPkgJson(rootDir), (r: Record<string, unknown>) =>
-    filter(r, (_, Pk): boolean => !omit.includes(Pk)),
+  let content = F.pipe(
+    await loadPkgJson(rootDir),
+    E.fromRight((r) =>
+      F.pipe(
+        r,
+        R.filter((_, Pk): boolean => !omit.includes(Pk)),
+      ),
+    ),
   );
 
-  if (!isRight(C)) {
-    throw new Error(C.left);
+  if (!E.isRight(content)) {
+    throw new Error(content.left);
   }
 
-  let json = mergePkgJson(C.right, rest);
+  let json = mergePkgJson(content.right, rest);
 
-  if (Object.hasOwn(json, "files") && Array.isArray(json.files)) {
-    json.files = json.files.filter((f: string) => !exclude.includes(f));
+  if (R.has(json, "files") && Array.isArray(json.files)) {
+    json.files = F.pipe(
+      json.files,
+      A.filter((f): boolean => !exclude.includes(f)),
+    );
   }
 
   let out = await find(outDir);
 
-  if (!isRight(out)) {
+  if (!E.isRight(out)) {
     throw new Error(out.left);
   }
 
-  if (isNonEmpty(include)) {
-    json.files = include;
-  }
+  if (A.isNonEmpty(include)) json.files = include;
 
-  await fs.promises.writeFile(
-    path.join(out.right, PKG),
-    JSON.stringify(json, null, 2),
-  );
+  await fs.writeFile(path.join(out.right, PKG), JSON.stringify(json, null, 2));
 
   await copyFiles(include, out.right);
 
